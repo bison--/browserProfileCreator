@@ -52,9 +52,18 @@ class BrowserProfileCreator:
         """
         default_cfg = configparser.ConfigParser()
         default_cfg["Paths"] = {
-            "applications_dir": "~/.local/share/applications",
-            "profiles_dir": "~/browsers",
-            "icons_dir": "~/Bilder/icons"
+            "applications_dir": Helper.prompt_user_setting(
+                "Enter the default-directory for your .desktop files:",
+                "~/.local/share/applications"
+            ),
+            "profiles_dir": Helper.prompt_user_setting(
+                "Enter the default-directory for your browser-folders:",
+                "~/browsers"
+            ),
+            "icons_dir": Helper.prompt_user_setting(
+                "Enter the default-directory for your icons:",
+                "~/Bilder/icons"
+            )
         }
         default_cfg["Templates"] = {
             "desktop": (
@@ -85,7 +94,7 @@ class BrowserProfileCreator:
             print("No supported browsers found.")
             return
 
-        browser_type = Helper.prompt_user(
+        browser_type = Helper.prompt_user_option_list(
             list(browsers.keys()), "Select browser type: "
         )
         purpose = input("Enter purpose name for the new profile: ").strip()

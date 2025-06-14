@@ -4,7 +4,24 @@ import shutil
 class Helper:
 
     @staticmethod
-    def prompt_user(options, prompt_message):
+    def prompt_user_setting(question, default=""):
+        user_input = ""
+
+        while True:
+            default_text = ""
+            if default:
+                default_text = " (default: {})".format(default)
+
+            user_input = input(question + default_text).strip()
+            if user_input:
+                return user_input
+            elif default:
+                return default
+
+            print("Invalid Input, please try again.")
+
+    @staticmethod
+    def prompt_user_option_list(options, prompt_message):
         """
         Prompt the user to select from a list of options.
         """
