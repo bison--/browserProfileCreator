@@ -1,7 +1,19 @@
+import os
 import shutil
 
 
 class Helper:
+
+    @staticmethod
+    def is_wayland():
+        """
+        Returns True if the system appears to be using Wayland, False otherwise.
+        """
+        # Common Wayland-related environment variables
+        return (
+            os.environ.get("WAYLAND_DISPLAY") is not None
+            or os.environ.get("XDG_SESSION_TYPE") == "wayland"
+        )
 
     @staticmethod
     def prompt_user_setting(question, default=""):
@@ -63,3 +75,7 @@ class Helper:
                     break
 
         return found
+
+
+if __name__ == "__main__":
+    print(Helper.is_wayland())

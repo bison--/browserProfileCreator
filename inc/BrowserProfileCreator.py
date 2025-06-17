@@ -109,6 +109,8 @@ class BrowserProfileCreator:
         # TODO: proper escaping for spaces
         if browser_type == BrowserProfileCreator.BROWSER_CHROME:
             exec_cmd += f" --user-data-dir={profile_dir}"
+            if Helper.is_wayland():
+                exec_cmd += " --ozone-platform=wayland"  # needed for drag & drop
         elif browser_type == BrowserProfileCreator.BROWSER_FIREFOX:
             exec_cmd += f" -profile={profile_dir}"
 
