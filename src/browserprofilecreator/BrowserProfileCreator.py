@@ -7,17 +7,18 @@ and generate .desktop files for launching profiles.
 """
 
 import os
+import re
 import subprocess
 import configparser
 
-from inc.Helper import Helper
+from .Helper import Helper
 
 
 class BrowserProfileCreator:
     """
     Manages creation of isolated browser profiles and corresponding .desktop files.
     """
-    DEFAULT_CONFIG_PATH = os.path.expanduser("~/.config/browserMaker/config.ini")
+    DEFAULT_CONFIG_PATH = os.path.expanduser("~/.config/browserProfileCreator/config.ini")
 
     BROWSER_CHROME = "chrome"
     BROWSER_FIREFOX = "firefox"
@@ -85,22 +86,27 @@ class BrowserProfileCreator:
         with open(self.config_path, "w") as cfg_file:
             default_cfg.write(cfg_file)
 
-    def create_profile(self):
+    def create_profile(self, browser_type=None, purpose=None, dry_run=False):
         """
         Main routine to create a new browser profile and its .desktop entry.
         """
+        if dry_run:
+            print("######### dry run #########")
         browsers = Helper.detect_browsers()
         if not browsers:
             print("No supported browsers found.")
             return
 
-        browser_type = Helper.prompt_user_option_list(
-            list(browsers.keys()), "Select browser type: "
-        )
-        purpose = input("Enter purpose name for the new profile: ").strip()
+        if not browser_type:
+            browser_type = Helper.prompt_user_option_list(
+                list(browsers.keys()), "Select browser type: "
+            )
+        if not purpose:
+            purpose = input("Enter purpose name for the new profile: ").strip()
 
         # Create profile directory
-        profile_dir = os.path.join(self.profiles_dir, purpose)
+        purpose_nospaces = re.sub(r"\W+", "_", purpose)
+        profile_dir = os.path.join(self.profiles_dir, purpose_nospaces)
         os.makedirs(profile_dir, exist_ok=True)
 
         exe_path = browsers[browser_type]
@@ -114,11 +120,11 @@ class BrowserProfileCreator:
         elif browser_type == BrowserProfileCreator.BROWSER_FIREFOX:
             exec_cmd += f" -profile={profile_dir}"
 
-        name = f"{browser_type.capitalize()} {purpose}"
+        name = f"{browser_type.capitalize()} {purpose_nospaces}"
         comment = f"{browser_type.capitalize()} with isolated profile for {purpose}"
-        icon_filename = f"{browser_type}_{purpose}_icon.png"
+        icon_filename = f"{browser_type}_{purpose_nospaces}_icon.png"
         icon_path = os.path.join(self.icons_dir, icon_filename)
-        startup_wm_class = f"{browser_type}-{purpose}"
+        startup_wm_class = f"{browser_type}-{purpose_nospaces}"
 
         # Generate .desktop content
         desktop_content = self.desktop_template.format(
@@ -130,19 +136,27 @@ class BrowserProfileCreator:
         )
 
         # Write .desktop file
-        desktop_filename = f"{browser_type}-{purpose}.desktop"
+        desktop_filename = f"{browser_type}-{purpose_nospaces}.desktop"
         desktop_filepath = os.path.join(self.applications_dir, desktop_filename)
         os.makedirs(self.applications_dir, exist_ok=True)
-        with open(desktop_filepath, "w") as desktop_file:
-            desktop_file.write(desktop_content)
+        if dry_run:
+            print(f"would write file `{desktop_filepath}` with contents:")
+            for line in desktop_content.split("\n"):
+                print("  ", line)
+        else:
+            with open(desktop_filepath, "w") as desktop_file:
+                desktop_file.write(desktop_content)
 
-        print("Create an icon here ", icon_path)
-        input("press enter to continue")
+        print(f"you may put a custom icon in this location: {icon_path}")
 
         # Update desktop database
-        subprocess.run(
-            ["update-desktop-database", self.applications_dir],
-            check=True
-        )
+        if not dry_run:
+            subprocess.run(
+                ["update-desktop-database", self.applications_dir],
+                check=True
+            )
 
-        print(f"Profile created: {desktop_filepath}")
+        if dry_run:
+            print(f"dry run: did not create profile at: {desktop_filepath}")
+        else:
+            print(f"Profile created: {desktop_filepath}")
