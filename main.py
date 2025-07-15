@@ -1,3 +1,5 @@
+#!/usr/bin/env -S uv run --script
+
 from inc.BrowserProfileCreator import BrowserProfileCreator
 
 def main():
