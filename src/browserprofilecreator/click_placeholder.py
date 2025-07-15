@@ -1,5 +1,4 @@
 
-print("FAKE!")
 def nonce_wrapper(f):
     return f
 
