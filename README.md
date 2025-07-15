@@ -14,6 +14,8 @@ and now it's automated.
 
 ## install
 
+### from source
+
 It just needs vanilla python 3
 
 Here a bash-alias for your `.bash_aliases`:  
@@ -26,4 +28,17 @@ Or run it with uvx:
 uvx browserprofilecreator
 # or with command line parameters:
 uvx --from 'browserprofilecreator[cli]' create --browser chrome --purpose "de-googlify yourself"
+```
+
+### as tool
+
+```bash
+uv tool install browserprofilecreator
+```
+
+## release
+
+```bash
+uv build
+uv publish
 ```
