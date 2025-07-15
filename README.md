@@ -18,7 +18,7 @@ It just needs vanilla python 3
 
 Here a bash-alias for your `.bash_aliases`:  
 ```bash
-alias run-browser-profile-creator="cd /path/to/the/github/browserProfileCreator && python3 main.py"
+alias run-browser-profile-creator="cd /path/to/the/github/browserProfileCreator && python3 main_vanilla.py"
 ```
 
 Or run it with uvx:
